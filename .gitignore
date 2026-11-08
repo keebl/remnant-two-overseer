@@ -454,3 +454,6 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 *-dev.csproj
 *-dev.sln
+
+# macOS build output
+dist/

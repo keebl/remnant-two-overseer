@@ -49,6 +49,11 @@
     <PackageReference Include="System.Reactive" Version="6.1.0" />
   </ItemGroup>
 
+  <!-- macOS builds: store settings/logs in the user's directories instead of inside the .app bundle -->
+  <PropertyGroup Condition="$(RuntimeIdentifier.StartsWith('osx'))">
+    <DefineConstants>$(DefineConstants);REMNANTOVERSEER_USER_DIRECTORIES</DefineConstants>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DebugSymbols>False</DebugSymbols>
     <DebugType>None</DebugType>

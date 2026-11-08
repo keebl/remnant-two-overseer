@@ -59,9 +59,22 @@ public partial class SettingsViewModel : ViewModelBase
         var topLevel = FileDialogManager.GetTopLevelForContext(this);
         if (topLevel == null) return;
 
+        IStorageFolder? startFolder = null;
+        if (RemnantOverseer.Utilities.CrossOverSaveLocator.IsMac)
+        {
+            var start = RemnantOverseer.Utilities.CrossOverSaveLocator.FindSaveFolder()
+                ?? (Directory.Exists(RemnantOverseer.Utilities.CrossOverSaveLocator.BottlesRoot)
+                    ? RemnantOverseer.Utilities.CrossOverSaveLocator.BottlesRoot : null);
+            if (start != null)
+            {
+                try { startFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(start); } catch { }
+            }
+        }
+
         var storageFiles = await topLevel.StorageProvider.OpenFilePickerAsync(
                         new FilePickerOpenOptions()
                         {
+                            SuggestedStartLocation = startFolder,
                             FileTypeFilter = [Saves],
                             AllowMultiple = false,
                             Title = LocalizationService.Get("Settings_ProfileFilePickerTitle")

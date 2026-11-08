@@ -39,6 +39,38 @@ C:\Users\[YourUser]\AppData\Local\Packages\PerfectWorldEntertainment.GFREMP2_jra
 
 If that doesn't work, you can try searching your drive for `containers.index` file. (The path should include `PerfectWorldEntertainment.GFREMP2`)
 
+# macOS (via CrossOver)
+Remnant 2 itself is Windows-only, but many Mac players run it through [CrossOver](https://www.codeweavers.com/crossover). Remnant Overseer runs natively on macOS (Apple Silicon) and finds your save inside your CrossOver bottles automatically.
+
+**Install**
+1. Download `RemnantOverseer-mac-arm64.zip` from the releases page and unzip it.
+2. Move `RemnantOverseer.app` to your Applications folder.
+3. The app is not notarized by Apple, so macOS will say it is "damaged". Run this once in Terminal:
+```bash
+xattr -cr /Applications/RemnantOverseer.app && codesign --force --deep --sign - /Applications/RemnantOverseer.app
+```
+   - `xattr -cr` removes the "downloaded from the internet" quarantine flag from the whole app.
+   - `codesign --force --deep --sign -` re-signs the app locally (ad-hoc), which Apple Silicon requires.
+4. Open the app.
+
+**Save location**
+
+The app looks for `profile.sav` under:
+```
+~/Library/Application Support/CrossOver/Bottles/*/drive_c/users/*/Saved Games/Remnant2/
+```
+If you have several, the most recently updated one is used. To pick one manually, open Settings; the file picker starts in your save folder. Tip: in any macOS file dialog, `Cmd+Shift+G` lets you paste a path, and `Cmd+Shift+.` shows hidden folders such as `Library`.
+
+Settings and logs are stored in `~/.config/remnant-two-overseer` and `~/.local/share/remnant-two-overseer`.
+
+**Build it yourself**
+
+With the [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) installed:
+```bash
+./build/macos/build-app.sh
+```
+This produces `dist/RemnantOverseer-mac-arm64.zip`. Use `RID=osx-x64` for an Intel build.
+
 # Compilation Options
 
 To aid in package management efforts the following options may be set at compile time:

@@ -49,11 +49,28 @@ public class SaveDataService
 
     public async Task<Dataset?> GetSaveData()
     {
+        if (FilePath != null && !Directory.Exists(FilePath) && RemnantOverseer.Utilities.CrossOverSaveLocator.IsMac)
+        {
+            var found = RemnantOverseer.Utilities.CrossOverSaveLocator.FindSaveFolder();
+            if (found != null)
+            {
+                _settingsService.Get().SaveFilePath = found;
+                await _settingsService.Sync();
+            }
+        }
+
         if (FilePath == null)
         {
             try
             {
-                _settingsService.Get().SaveFilePath = SaveUtils.GetSaveFolder();
+                string? detected = null;
+                try { detected = SaveUtils.GetSaveFolder(); } catch { }
+                if (detected is null || !Directory.Exists(detected))
+                {
+                    detected = RemnantOverseer.Utilities.CrossOverSaveLocator.FindSaveFolder()
+                        ?? throw new DirectoryNotFoundException("Save folder not found");
+                }
+                _settingsService.Get().SaveFilePath = detected;
                 await _settingsService.Sync();
                 WeakReferenceMessenger.Default.Send(new NotificationInfoMessage(NotificationStrings.DefaultLocationFound));
                 Log.Instance.Information(NotificationStrings.DefaultLocationFound);
